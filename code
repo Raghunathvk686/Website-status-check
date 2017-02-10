@@ -1,0 +1,86 @@
+try:
+	import requests
+	import smtplib
+except Exception as e:
+	print('Error>>>',e)
+
+
+
+site_list = {
+        'https://www.google.com':{ 
+            'description':'Google Search Engine' ,  
+            'username' : 'none' , 
+            'password': 'none'
+        } , 
+        'http://www.yahoo.com':{ 
+            'description':'Yahoo Search Engine' ,  
+            'username' : 'none' , 
+            'password': 'none'
+        } ,
+        'https://www.kernel.org':{
+            'description':'Linux Kernel Offcial Site' ,  
+            'username' : 'none' , 
+            'password': 'none'
+        },
+        'https://www.fsf.org':{ 
+            'description':'Free Software Foundation' , 
+            'username' : 'none' , 
+            'password': 'none'
+        },
+        'http://192.168.1.18':{ 
+            'description':'My D-link Router' , 
+            'username' : 'admin' , 
+            'password': 'admin'
+        }
+}
+
+def status_checker(url,name='none',password ='none'):
+
+    if name == 'none' and password == 'none':
+        try:
+            replay = requests.get(url,timeout=2)
+            if replay.status_code == 200:
+                return 'Up'
+            else:
+                return 'Down'
+        except Exception:
+            return 'Unable to access the LINK...!' 
+
+
+    elif name != 'none' and password != 'none':
+        try:
+            replay = requests.get(url,auth=(name,password),timeout=3)
+            if replay.status_code == 200:
+                return 'Up'
+            else:
+                return 'Down'
+        except Exception:
+            return 'Unable to access the LINK...!' 
+
+for ( url , details ) in site_list.items():
+	username = details['username']
+	password = details['password']
+	discription = details['description']
+	site_status = status_checker(url,name=username,password=password)
+	print(url,':',site_status)
+	
+	if (site_status == 'Down' or site_status == 'Unable to access the LINK...!'):
+				
+		From = 'raghunathvk686@gmail.com'  
+		Password = '9447150686'
+		To = 'raghunathvk686@gmail.com'
+		subject = 'Website status alert'
+		Text = 'Following are the status alert of the websites'
+		
+		try:  
+    			server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    			server.ehlo()
+    			server.login(From, Password)
+    			server.sendmail(From, To, site_status)
+    			server.close()
+	
+    			print ('Email sent!')
+		except:  
+    			print ('Something went wrong...')
+
+		
